@@ -145,7 +145,7 @@ const homeOnlyElements = [...document.querySelectorAll("[data-home-only]")];
 const pageTitles = {
   home: document.title,
   players: "玩家 · MTNetwork",
-  docs: "文档 · MTNetwork",
+  rankings: "排行榜 · MTNetwork",
 };
 let currentPage = "home";
 let homeScroll = 0;
@@ -154,7 +154,11 @@ let activePageAnimation;
 let initializedPage = false;
 function pageFromLocation() {
   const page = new URL(location.href).searchParams.get("page");
-  return page === "players" || page === "docs" ? page : "home";
+  if (page === "docs") {
+    window.location.replace("https://docs.mcmtn.net/");
+    return "home";
+  }
+  return ["players", "rankings"].includes(page) ? page : "home";
 }
 function scrollToPage(page, hash, restoreScroll, smooth = false) {
   const target =
@@ -214,6 +218,7 @@ async function renderPage(
   initializedPage = true;
   document.body.dataset.page = page;
   document.title = pageTitles[page];
+  document.dispatchEvent(new CustomEvent("mtn:page", { detail: { page } }));
   navigation.querySelectorAll("[data-route]").forEach((link) => {
     const selected = link.dataset.route === page;
     link.classList.toggle("nav-active", selected);
@@ -246,6 +251,7 @@ function navigateToPage(page, hash = "") {
   const url = new URL(location.href);
   if (page === "home") url.searchParams.delete("page");
   else url.searchParams.set("page", page);
+  url.searchParams.delete("player");
   url.hash = hash;
   if (url.href !== location.href) history.pushState({ page }, "", url);
   renderPage(page, { hash });

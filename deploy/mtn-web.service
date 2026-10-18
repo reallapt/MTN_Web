@@ -1,0 +1,18 @@
+[Unit]
+Description=MTNetwork player website
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/mtnserver/nvme/Web
+Environment=MTN_BIND=0.0.0.0
+Environment=PORT=5173
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 /home/mtnserver/nvme/Web/backend/app.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+UMask=0077
+
+[Install]
+WantedBy=default.target

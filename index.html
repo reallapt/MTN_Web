@@ -13,6 +13,7 @@
     <link rel="preload" href="assets/gallery/world-01.webp" as="image" />
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" defer></script>
+    <script src="players.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳转到主要内容</a>
@@ -32,7 +33,8 @@
           <a class="nav-active" href="./" data-route="home" aria-current="page"
             >首页</a
           ><a href="?page=players" data-route="players">玩家</a
-          ><a href="?page=docs" data-route="docs">文档</a>
+          ><a href="?page=rankings" data-route="rankings">排行榜</a
+          ><a href="https://docs.mcmtn.net/">文档</a>
         </nav>
         <a class="nav-join" href="#join"
           >加入我们 <span aria-hidden="true">↗</span></a
@@ -240,7 +242,7 @@
               <h3>从第一个方块开始</h3>
               <p>带上你的想法，剩下的慢慢来。</p>
             </div>
-            <a class="text-link" href="?page=docs" data-route="docs"
+            <a class="text-link" href="https://docs.mcmtn.net/"
               >游玩文档 <span aria-hidden="true">↗</span></a
             >
           </div>
@@ -248,21 +250,50 @@
       </div>
       <section
         id="players-view"
-        class="page-view placeholder-view"
+        class="page-view data-page container"
         data-view="players"
         aria-labelledby="players-title"
         hidden
       >
-        <h1 id="players-title" tabindex="-1">请输入文本</h1>
+        <div class="data-page-heading">
+          <div><p class="data-kicker">MTNetwork · 玩家档案</p><h1 id="players-title" tabindex="-1">一起建造的<span class="blue">我们。</span></h1></div>
+          <p class="data-page-caption"><strong id="player-count">—</strong> 份玩家记录<br /><span>按 UUID 独立记录，不合并同名账号</span></p>
+        </div>
+        <form id="players-filters" class="data-toolbar" role="search">
+          <label class="search-field"><span>查找玩家</span><input id="player-search" type="search" placeholder="输入名字或 UUID" maxlength="100" autocomplete="off" /></label>
+          <label class="select-field"><span>身份组</span><select id="player-group"><option value="">全部身份组</option></select></label>
+          <label class="select-field"><span>排序方式</span><select id="player-sort"><option value="play_time">游玩时长</option><option value="xp_level">经验等级</option><option value="mcmmo_total">mcMMO 总等级</option><option value="mined">方块挖掘</option><option value="last_played">最近游玩</option><option value="name">名字 A–Z</option><option value="uuid">UUID</option><option value="group">身份组</option></select></label>
+          <button class="data-refresh" type="button" data-refresh="players">刷新</button>
+        </form>
+        <div id="players-status" class="data-status" role="status" aria-live="polite">正在读取玩家记录…</div>
+        <div id="players-results" class="player-directory" aria-busy="true"></div>
+        <div id="players-pagination" class="data-pagination"></div>
+        <p class="data-footnote">时长按存档累计 tick 换算，包含挂机；等级与最近游玩时间为已保存记录，并非实时在线状态。未找到的数据显示为“暂无记录”。</p>
       </section>
-      <section
-        id="docs-view"
-        class="page-view placeholder-view"
-        data-view="docs"
-        aria-labelledby="docs-title"
-        hidden
-      >
-        <h1 id="docs-title" tabindex="-1">请输入文本</h1>
+      <section id="rankings-view" class="page-view data-page container" data-view="rankings" aria-labelledby="rankings-title" hidden>
+        <div class="data-page-heading"><div><p class="data-kicker">MTNetwork · 玩家排行</p><h1 id="rankings-title" tabindex="-1">每一份<span class="blue">热爱。</span></h1></div><p class="data-page-caption">用时间与方块<br /><span>记录大家留在这里的足迹</span></p></div>
+        <div class="ranking-layout">
+          <aside class="ranking-sidebar" aria-label="选择排行榜">
+            <p class="data-kicker">综合排行</p>
+            <div id="ranking-categories" class="ranking-categories">
+              <button type="button" data-metric="play_time" aria-pressed="true">游玩时长<span>↗</span></button>
+              <button type="button" data-metric="xp_level" aria-pressed="false">经验等级<span>↗</span></button>
+              <button type="button" data-metric="mcmmo_total" aria-pressed="false">mcMMO 总等级<span>↗</span></button>
+              <button type="button" data-metric="mined" aria-pressed="false">方块挖掘<span>↗</span></button>
+              <button type="button" data-metric="last_played" aria-pressed="false">最近游玩<span>↗</span></button>
+            </div>
+            <label class="select-field skill-select"><span>mcMMO 单项技能</span><select id="ranking-skill"><option value="">选择技能排行榜</option></select></label>
+            <label class="select-field skill-select"><span>身份组筛选</span><select id="ranking-group"><option value="">全部身份组</option></select></label>
+            <p class="ranking-note">相同数值并列排名。缺失数据不参与该项排行。名字与 UUID 可在玩家页排序查询。</p>
+          </aside>
+          <div class="ranking-main">
+            <div class="ranking-list-heading"><h2 id="ranking-label">游玩时长</h2><button class="data-refresh" type="button" data-refresh="rankings">刷新</button></div>
+            <div id="rankings-status" class="data-status" role="status" aria-live="polite">正在读取排行榜…</div>
+            <div id="rankings-results" aria-busy="true"></div>
+            <div id="rankings-pagination" class="data-pagination"></div>
+            <p class="data-footnote">每 30 秒读取一次服务器数据；网页每分钟自动检查更新。历史存档与不同 UUID 独立参与排名。</p>
+          </div>
+        </div>
       </section>
     </main>
     <footer class="footer container" data-home-only>
@@ -285,5 +316,9 @@
       </div>
     </footer>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <dialog id="player-dialog" class="player-dialog" aria-labelledby="profile-name">
+      <div class="profile-dialog-top"><span class="data-kicker">玩家档案</span><button type="button" id="close-player" class="data-refresh">关闭 <span aria-hidden="true">×</span></button></div>
+      <div id="player-profile" aria-live="polite"></div>
+    </dialog>
   </body>
 </html>
